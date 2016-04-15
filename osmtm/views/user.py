@@ -124,10 +124,15 @@ def user(request):
 
 def __get_projects(user_id):
     """ get the tiles that changed """
-    filter = and_(TaskState.state == TaskState.state_done,
-                  TaskState.user_id == user_id,
+    filter = and_(TaskState.user_id == user_id,
                   TaskState.project_id == Project.id)
-    projects = DBSession.query(Project, func.count(TaskState.user_id)) \
+    sq_don = DBSession.query(func.count(TaskState.user_id)) \
+                        .filter((TaskState.state == TaskState.state_done)) \
+                        .subquery()
+    sq_val = DBSession.query(func.count(TaskState.user_id)) \
+                        .filter((TaskState.state == TaskState.state_validated)) \
+                        .subquery()
+    projects = DBSession.query(Project, sq_don, sq_val) \
                         .filter(filter) \
                         .group_by(Project.id) \
                         .order_by(desc(Project.id)) \
