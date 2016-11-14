@@ -11,6 +11,7 @@ from sqlalchemy import (
 
 from ..models import (
     DBSession,
+    FrontProjects,
     Project,
     ProjectTranslation,
     User,
@@ -44,9 +45,65 @@ def home(request):
         request.override_renderer = 'start.mako'
         return dict(page_id="start")
 
-    paginator, tags = get_projects(request, 10)
+    paginator, tags, well1, well2, well3 = get_projects(request, 10)
+    front_tags = DBSession.query(FrontProjects).all()
+    names = []
+    for tag in front_tags:
+      try:
+        names.append(DBSession.query(Tag.name).filter(Tag.id == tag.tag).one()[0])
+      except:
+        names.append(None)
 
-    return dict(page_id="home", paginator=paginator, tags=tags)
+    return dict(page_id="home", well1=well1, well2=well2, well3=well3, front_tags=names)
+
+
+@view_config(route_name='front_tags', renderer='front_tags.mako')
+def front_tag(request):
+    tags = DBSession.query(Tag).all()
+
+    if 'form.submitted' in request.params:
+      front_tags = [x[4:] for x in request.params if 'tag_' in x]
+      for i in range(3):
+        if len(front_tags) > i:
+          t = DBSession.query(FrontProjects).filter(FrontProjects.well == i).one()
+          t.tag = front_tags[i]
+          DBSession.add(t)
+          DBSession.flush()
+        else:
+          t = DBSession.query(FrontProjects).filter(FrontProjects.well == i).one()
+          t.tag = None
+          DBSession.add(t)
+          DBSession.flush()
+
+    front_tags = DBSession.query(FrontProjects).all()
+
+    if len(front_tags) != 3:
+      f1 = FrontProjects(0, None)
+      f2 = FrontProjects(1, None)
+      f3 = FrontProjects(2, None)
+      DBSession.add(f1)
+      DBSession.add(f2)
+      DBSession.add(f3)
+    DBSession.flush()
+
+    front_tags = DBSession.query(FrontProjects).all()
+
+    return dict(page_id="front_tags", tags=tags, front_tags=front_tags)
+
+
+@view_config(route_name='list', renderer='list.mako')
+def list_of_projects(request):
+    check_project_expiration()
+
+    # no user in the DB yet
+    if DBSession.query(User).filter(User.role == User.role_admin) \
+                .count() == 0:   # pragma: no cover
+        request.override_renderer = 'start.mako'
+        return dict(page_id="start")
+
+    paginator, tags, a, b, c = get_projects(request, 10)
+
+    return dict(page_id="list", paginator=paginator, tags=tags)
 
 
 @view_config(route_name='home_json', renderer='json')
@@ -153,7 +210,17 @@ def get_projects(request, items_per_page):
     page_url = PageURL_WebOb(request)
     paginator = Page(query, page, url=page_url, items_per_page=items_per_page)
 
-    return paginator, tags
+    front_projects = DBSession.query(FrontProjects).all()
+    wells = []
+    for ii in range(3):
+      try:
+        the_tag = front_projects[ii]
+        query = DBSession.query(Project).filter(Project.tags.any(id=the_tag.tag)).all()
+        wells.append(query)
+      except:
+        wells.append(None)
+
+    return paginator, tags, wells[0], wells[1], wells[2]
 
 
 @view_config(route_name='about', renderer='about.mako')

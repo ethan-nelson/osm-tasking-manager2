@@ -463,6 +463,17 @@ project_tags_table = Table(
     Column('tag', Integer, ForeignKey('tags.id')))
 
 
+class FrontProjects(Base):
+    __tablename__ = 'front_projects'
+    id = Column(Integer, primary_key=True)
+    well = Column(Integer)
+    tag = Column(Integer, ForeignKey('tags.id'))
+
+    def __init__(self, well, tag):
+        self.well = well
+        self.tag = tag
+
+
 # A project corresponds to a given mapping job to do on a given area
 # Example 1: trace the major roads
 # Example 2: trace the buildings
