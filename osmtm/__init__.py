@@ -129,6 +129,7 @@ def main(global_config, **settings):
 
     config.add_route('tags', '/tags')
     config.add_route('tag_new', '/tag/new')
+    config.add_route('tag', '/tag/{tag:\d+}')
     config.add_route('tag_edit', '/tag/{tag:\d+}/edit')
     config.add_route('tag_delete', '/tag/{tag:\d+}/delete')
 
