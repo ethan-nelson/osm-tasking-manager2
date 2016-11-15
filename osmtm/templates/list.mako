@@ -112,7 +112,6 @@ sorts = [('priority', 'asc', _('High priority first')),
       % endfor
       </div>
     % endif
-    ${custom.main_page_right_panel()}
   </div>
 </div>
 </%block>
