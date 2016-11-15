@@ -25,7 +25,7 @@ from osmtm.mako_filters import markdown_filter
   % if len(project.tags) is not 0:
     <small class="text-muted">${_('Project tags:')}
     % for tag in project.tags:
-      <span class="label label-tag">${tag.name}</span>
+      <span class="label label-tag"><a href="${request.route_url('list')}?search=tag%3A${tag.name}">${tag.name}</a></span>
     % endfor
     </small>
   % endif
