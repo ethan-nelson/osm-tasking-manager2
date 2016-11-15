@@ -45,8 +45,16 @@ def home(request):
         request.override_renderer = 'start.mako'
         return dict(page_id="start")
 
-    paginator, tags, well1, well2, well3 = get_projects(request, 10)
     front_tags = DBSession.query(FrontProjects).all()
+    wells = []
+    for ii in range(3):
+      try:
+        the_tag = front_tags[ii]
+        query = DBSession.query(Project).filter(Project.tags.any(id=the_tag.tag)).all()
+        wells.append(query)
+      except:
+        wells.append(None)
+
     names = []
     for tag in front_tags:
       try:
@@ -54,7 +62,7 @@ def home(request):
       except:
         names.append(None)
 
-    return dict(page_id="home", well1=well1, well2=well2, well3=well3, front_tags=names)
+    return dict(page_id="home", well1=wells[0], well2=wells[1], well3=wells[2], front_tags=names)
 
 
 @view_config(route_name='front_tags', renderer='front_tags.mako')
@@ -101,7 +109,7 @@ def list_of_projects(request):
         request.override_renderer = 'start.mako'
         return dict(page_id="start")
 
-    paginator, tags, a, b, c = get_projects(request, 10)
+    paginator, tags = get_projects(request, 10)
 
     return dict(page_id="list", paginator=paginator, tags=tags)
 
@@ -210,17 +218,7 @@ def get_projects(request, items_per_page):
     page_url = PageURL_WebOb(request)
     paginator = Page(query, page, url=page_url, items_per_page=items_per_page)
 
-    front_projects = DBSession.query(FrontProjects).all()
-    wells = []
-    for ii in range(3):
-      try:
-        the_tag = front_projects[ii]
-        query = DBSession.query(Project).filter(Project.tags.any(id=the_tag.tag)).all()
-        wells.append(query)
-      except:
-        wells.append(None)
-
-    return paginator, tags, wells[0], wells[1], wells[2]
+    return paginator, tags
 
 
 @view_config(route_name='about', renderer='about.mako')
