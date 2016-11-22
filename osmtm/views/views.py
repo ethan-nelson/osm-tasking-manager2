@@ -50,7 +50,7 @@ def home(request):
     for ii in range(3):
       try:
         the_tag = front_tags[ii]
-        query = DBSession.query(Project).filter(Project.tags.any(id=the_tag.tag)).all()
+        query = DBSession.query(Project).filter(Project.tags.any(id=the_tag.tag)).order_by(Project.priority.asc()).all()
         wells.append(query)
       except:
         wells.append(None)
