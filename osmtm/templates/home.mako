@@ -44,6 +44,8 @@ sorts = [('priority', 'asc', _('High priority first')),
       % for project in well3:
         <a href="${base_url}project/${project.id}">#${project.id} ${project.name}</a><br />
       % endfor
+      <hr />
+      <a href="${base_url}list?search=tag%3A${front_tags[2]}">More projects</a>
     </div>
     % endif
   </div>
@@ -54,6 +56,8 @@ sorts = [('priority', 'asc', _('High priority first')),
       % for project in well2:
         <a href="${base_url}project/${project.id}">#${project.id} ${project.name}</a><br />
       % endfor
+      <hr />
+      <a href="${base_url}list?search=tag%3A${front_tags[1]}">More projects</a>
     </div>
     % endif
   </div>
@@ -64,6 +68,8 @@ sorts = [('priority', 'asc', _('High priority first')),
       % for project in well1:
         <a href="${base_url}project/${project.id}">#${project.id} ${project.name}</a><br />
       % endfor
+      <hr />
+      <a href="${base_url}list?search=tag%3A${front_tags[0]}">More projects</a>
     </div>
     % endif
   </div>
