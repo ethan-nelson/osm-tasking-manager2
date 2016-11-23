@@ -23,7 +23,8 @@ from webhelpers.paginate import (
 )
 
 from geojson import (
-    FeatureCollection
+    FeatureCollection,
+    Feature
 )
 
 from .project import check_project_expiration
@@ -31,6 +32,10 @@ from .project import check_project_expiration
 from pyramid.security import authenticated_userid
 
 from sqlalchemy.orm import joinedload
+
+from geoalchemy2 import (
+    shape,
+)
 
 
 @view_config(route_name='home', renderer='home.mako')
@@ -138,6 +143,25 @@ def get_projects(request, items_per_page):
 @view_config(route_name='about', renderer='about.mako')
 def about(request):
     return dict(page_id="about")
+
+
+@view_config(route_name='overview', renderer='overview.mako')
+def overview(request):
+    areas = []
+    projects = DBSession.query(Project) \
+                        .filter(Project.status == Project.status_published) \
+                        .order_by(Project.priority.asc()).limit(10).all()
+
+    for project in projects:
+        popup = '<a href="' + request.route_path('project',
+                                                 project=project.id) + \
+                    '">#' + str(project.id) + ': ' + project.name
+        areas.append(Feature(geometry=shape.to_shape(project.area.geometry),
+                             properties={'id': str(project.id),
+                                         'name': project.name,
+                                         'popup': popup}))
+
+    return dict(page_id="overview", project_areas=FeatureCollection(areas))
 
 
 @view_config(route_name="user_prefered_editor", renderer='json')

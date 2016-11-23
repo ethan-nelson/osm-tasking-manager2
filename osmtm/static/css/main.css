@@ -6731,6 +6731,13 @@ h1 {
   opacity: 0.6;
   filter: alpha(opacity=60);
 }
+#overview #leaflet {
+  height: 400px;
+}
+#overview .mask {
+  opacity: 0.6;
+  filter: alpha(opacity=60);
+}
 #messages table > tbody > tr.unread {
   background-color: #efefef;
 }
