@@ -24,7 +24,7 @@ def upgrade():
 
 
     tag_translation_table = op.create_table(
-        'tags_translations',
+        'tags_translation',
         sa.Column('id', sa.Integer, nullable=False),
         sa.Column('locale', sa.String(10), nullable=False),
         sa.Column('spotlight_text', sa.String),
@@ -44,5 +44,5 @@ def upgrade():
 
 def downgrade():
     op.drop_table('project_tags')
-    op.drop_table('tags_translations')
+    op.drop_table('tags_translation')
     op.drop_table('tags')
