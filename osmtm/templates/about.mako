@@ -70,7 +70,12 @@
           txt = '<a href="%s">%s</a>' % (url, ver)
           vertxt = '<h3>' + _('Version') + '</h3><p>' + txt + '</p>'
       except:
-          vertxt = ''
+          try:
+              verfile = open('../../version.txt', 'r')
+              vertxt = '<h3>' + _('Version') + '</h3><p>' + verfile.read().rstrip('\n') + '</p>'
+              verfile.close()
+          except:
+              vertxt = ''
 %>
       ${vertxt |n}
     </div>
